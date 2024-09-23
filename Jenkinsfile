@@ -29,10 +29,11 @@ pipeline {
                     //def scannerHome = tool 'SonarQube Scanner'
                     //def scannerHome = tool 'SonarQube Scanner 2.8';
                     //def sonarqubeScannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    def scannerHome = tool 'SonarScanner';
+                    //def scannerHome = tool 'SonarScanner';
+                    def sonarqubeScannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     //def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv(installationName: "sq1"){
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh "${scannerqubeHome}/bin/sonar-scanner"
                         //sh "${scannerHome}/bin/sonar-scanner"
                         /*
                         //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
