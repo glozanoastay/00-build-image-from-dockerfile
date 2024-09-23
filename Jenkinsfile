@@ -14,6 +14,13 @@ pipeline {
     }
 
     stages {
+        stage("Init"){
+            steps {
+                sh 'ls'
+                sh 'uname -a'
+                sh 'ip a'
+            }
+        }
         stage('Build Container Image') {
             steps {
                 script {
