@@ -21,14 +21,17 @@ pipeline {
         stage('Run Code Analysis') {
             steps {
                 //sh 'sonar-scanner --help'
-                
+                def scannerHome = tool 'SonarScanner';
                 withSonarQubeEnv(installationName: "sq1"){
+                    sh "${scannerHome}/bin/sonar-scanner"
+                    /*
                     //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
                     sh '''sonar-scanner \
                     -Dsonar.projectKey=00-build-image-from-dockerfile \
                     -Dsonar.sources=. \
                     -Dsonar.host.url=http://192.168.56.1:9000
                     '''
+                    */
                 }
                 
                 sh 'pwd'
