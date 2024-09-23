@@ -18,6 +18,20 @@ pipeline {
             }
         }
 
+        stage("scan"){
+            tools {
+                jdk "jdk17" // the name you have given the JDK installation in Global Tool Configuration
+            }
+            environment {
+                scannerHome = tool 'SonarQube Scanner' // the name you have given the Sonar Scanner (in Global Tool Configuration)
+            }
+            steps {
+                withSonarQubeEnv(installationName: 'sq1') {
+                    sh "${scannerHome}/bin/sonar-scanner -X"
+                }
+            }
+        }
+        /*
         stage('Run Code Analysis') {
             steps {
                 sh 'echo $PATH'
@@ -42,7 +56,6 @@ pipeline {
                         -Dsonar.sources=. \
                         -Dsonar.host.url=http://192.168.56.1:9000
                         '''
-                        */
                     }
                     
                     sh 'pwd'
@@ -72,10 +85,10 @@ pipeline {
                             -Dsonar.token=$SONAR_TOKEN
                         '''
                     }
-                    */
                 }
             }
         }
+        */
 
         stage ("Quality Gate"){ // wait for sonarqube analysis and abort execution if source code does not meet required quality level
             steps {
