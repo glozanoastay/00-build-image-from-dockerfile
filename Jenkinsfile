@@ -21,9 +21,11 @@ pipeline {
         stage('Run Code Analysis') {
             steps {
                 //sh 'sonar-scanner --help'
-                def scannerHome = tool 'SonarScanner';
+                //def scannerHome = tool 'SonarScanner';
+                def scannerHome = tool 'SonarQubeScanner'
                 withSonarQubeEnv(installationName: "sq1"){
                     sh "${scannerHome}/bin/sonar-scanner"
+                    //sh "${scannerHome}/bin/sonar-scanner"
                     /*
                     //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
                     sh '''sonar-scanner \
