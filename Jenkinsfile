@@ -27,7 +27,7 @@ pipeline {
                 -Dsonar.projectKey=00-build-image-from-dockerfile \
                 -Dsonar.sources=. \
                 -Dsonar.host.url=http://192.168.56.1:9000 \
-                -Dsonar.token=sqp_98b42b018de2463e6324f45e70b3e6851d3eac24
+                -Dsonar.token=squ_37f5b383156684059f788c6eee6c305823dad0d6
                 '''
                 /*
                 withSonarQubeEnv(installationName: "sq"){
