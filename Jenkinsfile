@@ -22,8 +22,8 @@ pipeline {
             steps {
                 script {
                     //sh 'sonar-scanner --help'
-                    //def scannerHome = tool 'SonarScanner';
-                    def scannerHome = tool 'SonarQubeScanner'
+                    def scannerHome = tool 'SonarScanner';
+                    //def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv(installationName: "sq1"){
                         sh "${scannerHome}/bin/sonar-scanner"
                         //sh "${scannerHome}/bin/sonar-scanner"
