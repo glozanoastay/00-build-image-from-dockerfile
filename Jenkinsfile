@@ -14,14 +14,15 @@ pipeline {
     stages {
         stage("Init"){
             steps {
+                sh 'pwd'
                 sh 'ls'
-                sh 'uname -a'
-                sh 'ip a'
             }
         }
 
         stage('Run Code Analysis') {
             steps {
+                sh 'whereis sonar-scanner'
+                sh 'sonar-scanner --help'
                 withSonarQubeEnv(installationName: "sq1"){
                     sh 'sonar-scanner'
                 }
