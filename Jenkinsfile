@@ -23,10 +23,10 @@ pipeline {
                 script {
                     //sh 'sonar-scanner --help'
                     // [NEXT ATTEMPT] 
-                    def scannerHome = tool 'SonarQube Scanner'
+                    //def scannerHome = tool 'SonarQube Scanner'
                     //def scannerHome = tool 'SonarQube Scanner 2.8';
                     //def sonarqubeScannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    //def scannerHome = tool 'SonarScanner';
+                    def scannerHome = tool 'SonarScanner';
                     //def scannerHome = tool 'SonarQubeScanner'
                     withSonarQubeEnv(installationName: "sq1"){
                         sh "${scannerHome}/bin/sonar-scanner"
