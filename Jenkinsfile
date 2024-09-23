@@ -4,13 +4,11 @@ pipeline {
 
     parameters {
         string(name: 'IMAGE_NAME', defaultValue: 'example-python', description: 'Container Image Name')
-        string(name: 'IMAGE_REGISTRY_URI', defaultValue: 'https://720766170633.dkr.ecr.us-east-2.amazonaws.com', description: 'Container Image Registry')
+        //string(name: 'IMAGE_REGISTRY_URI', defaultValue: 'https://720766170633.dkr.ecr.us-east-2.amazonaws.com', description: 'Container Image Registry')
 
-        /*
         // WITHOUT SonarQube PLUGIN
-        string(name: 'SONAR_PROJECT', defaultValue: 'example02', description: 'SonarQube Project Key')
+        string(name: 'SONAR_PROJECT', defaultValue: '', description: 'SonarQube Project Key')
         string(name: 'SONAR_HOST', defaultValue: 'http://localhost:9000', description: 'SonarQube Host')
-        */
     }
 
     stages {
@@ -24,9 +22,18 @@ pipeline {
 
         stage('Run Code Analysis') {
             steps {
+                sh '''
+                sonar-scanner \
+                -Dsonar.projectKey=00-build-image-from-dockerfile \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://localhost:9000 \
+                -Dsonar.token=sqp_98b42b018de2463e6324f45e70b3e6851d3eac24
+                '''
+                /*
                 withSonarQubeEnv(installationName: "sq"){
                     sh 'sonar-scanner'
                 }
+                */
                 /*
                 // WITHOUT SonarQube PLUGIN
                 withCredentials([string(credentialsId: 'example-sonarcube-creds', variable: 'SONAR_TOKEN')]) {
