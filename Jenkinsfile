@@ -21,14 +21,6 @@ pipeline {
                 sh 'ip a'
             }
         }
-        stage('Build Container Image') {
-            steps {
-                script {
-                    def imageName = "${params.IMAGE_NAME}"
-                    image = docker.build("${imageName}")
-                }
-            }
-        }
 
         stage('Run Code Analysis') {
             steps {
@@ -58,6 +50,18 @@ pipeline {
             }
         }
 
+
+
+        /*
+        stage('Build Container Image') {
+            steps {
+                script {
+                    def imageName = "${params.IMAGE_NAME}"
+                    image = docker.build("${imageName}")
+                }
+            }
+        }
+
         stage('Push Container Image') {
             steps {
                 script {
@@ -76,6 +80,7 @@ pipeline {
                 }
             }
         }
+    */
     }
 }
 
