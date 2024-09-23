@@ -21,6 +21,8 @@ pipeline {
         stage('Run Code Analysis') {
             steps {
                 sh 'echo $PATH'
+                sh 'echo $JAVA_HOME'
+                sh 'java --version'
                 script {
                     //sh 'sonar-scanner --help'
                     // [NEXT ATTEMPT] 
