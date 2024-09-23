@@ -20,50 +20,52 @@ pipeline {
 
         stage('Run Code Analysis') {
             steps {
-                //sh 'sonar-scanner --help'
-                //def scannerHome = tool 'SonarScanner';
-                def scannerHome = tool 'SonarQubeScanner'
-                withSonarQubeEnv(installationName: "sq1"){
-                    sh "${scannerHome}/bin/sonar-scanner"
-                    //sh "${scannerHome}/bin/sonar-scanner"
-                    /*
-                    //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
+                script {
+                    //sh 'sonar-scanner --help'
+                    //def scannerHome = tool 'SonarScanner';
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv(installationName: "sq1"){
+                        sh "${scannerHome}/bin/sonar-scanner"
+                        //sh "${scannerHome}/bin/sonar-scanner"
+                        /*
+                        //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
+                        sh '''sonar-scanner \
+                        -Dsonar.projectKey=00-build-image-from-dockerfile \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://192.168.56.1:9000
+                        '''
+                        */
+                    }
+                    
+                    sh 'pwd'
+                    sh 'ls'
+                    sh 'whoami'
+                    sh 'whereis sonar-scanner'
                     sh '''sonar-scanner \
                     -Dsonar.projectKey=00-build-image-from-dockerfile \
                     -Dsonar.sources=. \
-                    -Dsonar.host.url=http://192.168.56.1:9000
+                    -Dsonar.host.url=http://192.168.56.1:9000 \
+                    -Dsonar.token=squ_37f5b383156684059f788c6eee6c305823dad0d6
                     '''
+                    
+                    /*
+                    withSonarQubeEnv(installationName: "sq"){
+                        sh 'sonar-scanner'
+                    }
+                    */
+                    /*
+                    // WITHOUT SonarQube PLUGIN
+                    withCredentials([string(credentialsId: 'example-sonarcube-creds', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                        sonar-scanner \
+                            -Dsonar.projectKey=${params.SONAR_PROJECT} \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=${params.SONAR_HOST} \
+                            -Dsonar.token=$SONAR_TOKEN
+                        '''
+                    }
                     */
                 }
-                
-                sh 'pwd'
-                sh 'ls'
-                sh 'whoami'
-                sh 'whereis sonar-scanner'
-                sh '''sonar-scanner \
-                -Dsonar.projectKey=00-build-image-from-dockerfile \
-                -Dsonar.sources=. \
-                -Dsonar.host.url=http://192.168.56.1:9000 \
-                -Dsonar.token=squ_37f5b383156684059f788c6eee6c305823dad0d6
-                '''
-                
-                /*
-                withSonarQubeEnv(installationName: "sq"){
-                    sh 'sonar-scanner'
-                }
-                */
-                /*
-                // WITHOUT SonarQube PLUGIN
-                withCredentials([string(credentialsId: 'example-sonarcube-creds', variable: 'SONAR_TOKEN')]) {
-                    sh '''
-                    sonar-scanner \
-                        -Dsonar.projectKey=${params.SONAR_PROJECT} \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${params.SONAR_HOST} \
-                        -Dsonar.token=$SONAR_TOKEN
-                    '''
-                }
-                */
             }
         }
 
