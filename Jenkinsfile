@@ -23,10 +23,11 @@ pipeline {
             steps {
                 sh 'whereis sonar-scanner'
                 sh 'sonar-scanner --help'
+                /*
                 withSonarQubeEnv(installationName: "sq1"){
                     sh 'sonar-scanner'
                 }
-                /*
+                */
                 sh '''
                 sonar-scanner \
                 -Dsonar.projectKey=00-build-image-from-dockerfile \
@@ -34,7 +35,7 @@ pipeline {
                 -Dsonar.host.url=http://192.168.56.1:9000 \
                 -Dsonar.token=squ_37f5b383156684059f788c6eee6c305823dad0d6
                 '''
-                */
+                
                 /*
                 withSonarQubeEnv(installationName: "sq"){
                     sh 'sonar-scanner'
