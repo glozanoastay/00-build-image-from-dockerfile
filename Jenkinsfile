@@ -26,7 +26,7 @@ pipeline {
                 sonar-scanner \
                 -Dsonar.projectKey=00-build-image-from-dockerfile \
                 -Dsonar.sources=. \
-                -Dsonar.host.url=http://localhost:9000 \
+                -Dsonar.host.url=http://192.168.56.1:9000 \
                 -Dsonar.token=sqp_98b42b018de2463e6324f45e70b3e6851d3eac24
                 '''
                 /*
