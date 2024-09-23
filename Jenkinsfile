@@ -20,6 +20,7 @@ pipeline {
 
         stage('Run Code Analysis') {
             steps {
+                sh 'echo $PATH'
                 script {
                     //sh 'sonar-scanner --help'
                     // [NEXT ATTEMPT] 
