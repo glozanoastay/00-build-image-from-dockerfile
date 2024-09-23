@@ -1,6 +1,6 @@
 pipeline {
     //agent { dockerfile true }
-    agent { label 'builder' }
+    agent { label 'linux' }
 
     parameters {
         string(name: 'IMAGE_NAME', defaultValue: 'example-python', description: 'Container Image Name')
