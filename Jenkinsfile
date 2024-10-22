@@ -25,7 +25,11 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
-                        // Run SonarQube analysis
+                        sh 'uname -a'
+                        sh 'ip a'
+                        sh 'id'
+                        sh 'ping -c 3 8.8.8.8'
+                        sh 'whereis sonar-scanner'
                         sh """
                         sonar-scanner \
                             -Dsonar.projectKey=your-project-key \
