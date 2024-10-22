@@ -1,131 +1,87 @@
 pipeline {
-    //agent { dockerfile true }
-    agent { label 'linux' }
+    agent { dockerfile true }
 
-    parameters {
-        string(name: 'IMAGE_NAME', defaultValue: 'example-python', description: 'Container Image Name')
-        //string(name: 'IMAGE_REGISTRY_URI', defaultValue: 'https://720766170633.dkr.ecr.us-east-2.amazonaws.com', description: 'Container Image Registry')
-
-        // WITHOUT SonarQube PLUGIN
-        string(name: 'SONAR_PROJECT', defaultValue: '', description: 'SonarQube Project Key')
-        string(name: 'SONAR_HOST', defaultValue: 'http://localhost:9000', description: 'SonarQube Host')
+    environment {
+        CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
+        CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${env.BUILD_NUMBER}"
+        CONTAINER_REGISTRY = 'your-docker-registry-url'
+        K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
+        K8S_NAMESPACE = 'example'
     }
 
     stages {
-        stage("Init"){
+        stage('Run Tests') {
             steps {
-                sh 'uname -a'
-            }
-        }
-
-        stage("scan"){
-            environment {
-                scannerHome = tool 'SonarQube Scanner' // the name you have given the Sonar Scanner (in Global Tool Configuration)
-            }
-            steps {
-                withSonarQubeEnv(installationName: 'sq1') {
-                    sh "${scannerHome}/bin/sonar-scanner -X"
+                script {
+                    // Run tests in the Docker container
+                    sh 'python -m unittest test_app.py' // Replace with your test command
                 }
             }
         }
-        /*
-        stage('Run Code Analysis') {
+
+        stage('Static Analysis') {
             steps {
-                sh 'echo $PATH'
-                sh 'echo $JAVA_HOME'
-                sh 'java --version'
                 script {
-                    //sh 'sonar-scanner --help'
-                    // [NEXT ATTEMPT] 
-                    //def scannerHome = tool 'SonarQube Scanner'
-                    //def scannerHome = tool 'SonarQube Scanner 2.8';
-                    //def sonarqubeScannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    //def scannerHome = tool 'SonarScanner';
-                    def sonarqubeScannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    //def scannerHome = tool 'SonarQubeScanner'
-                    withSonarQubeEnv(installationName: "sq1"){
-                        sh "${scannerqubeHome}/bin/sonar-scanner"
-                        //sh "${scannerHome}/bin/sonar-scanner"
-                        /*
-                        //sh 'sonar-scanner -Dsonar.projectKey=00-build-image-from-dockerfile'
-                        sh '''sonar-scanner \
-                        -Dsonar.projectKey=00-build-image-from-dockerfile \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://192.168.56.1:9000
-                        '''
-                    }
-                    
-                    sh 'pwd'
-                    sh 'ls'
-                    sh 'whoami'
-                    sh 'whereis sonar-scanner'
-                    sh '''sonar-scanner \
-                    -Dsonar.projectKey=00-build-image-from-dockerfile \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://192.168.56.1:9000 \
-                    -Dsonar.token=squ_37f5b383156684059f788c6eee6c305823dad0d6
-                    '''
-                    
-                    /*
-                    withSonarQubeEnv(installationName: "sq"){
-                        sh 'sonar-scanner'
-                    }
-                    */
-                    /*
-                    // WITHOUT SonarQube PLUGIN
-                    withCredentials([string(credentialsId: 'example-sonarcube-creds', variable: 'SONAR_TOKEN')]) {
-                        sh '''
+                    withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
+                        // Run SonarQube analysis
+                        sh """
                         sonar-scanner \
-                            -Dsonar.projectKey=${params.SONAR_PROJECT} \
+                            -Dsonar.projectKey=your-project-key \
+                            -Dsonar.projectName=${CONTAINER_IMAGE_NAME} \
+                            -Dsonar.projectVersion=${env.BUILD_NUMBER} \
                             -Dsonar.sources=. \
-                            -Dsonar.host.url=${params.SONAR_HOST} \
-                            -Dsonar.token=$SONAR_TOKEN
-                        '''
+                            -Dsonar.language=python # Replace with your language if different
+                        """
                     }
                 }
             }
         }
-        */
 
-        stage ("Quality Gate"){ // wait for sonarqube analysis and abort execution if source code does not meet required quality level
-            steps {
-                timeout(time: 2, unit: "MINUTES"){
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-
-
-
-        /*
-        stage('Build Container Image') {
-            steps {
-                script {
-                    def imageName = "${params.IMAGE_NAME}"
-                    image = docker.build("${imageName}")
-                }
-            }
-        }
-
+/*
         stage('Push Container Image') {
             steps {
                 script {
-                    docker.withRegistry("${params.IMAGE_REGISTRY_URI}", 'ecr:us-east-2:aws-credentials') {
-                        image.push("${env.BUILD_NUMBER}")
-                        image.push("latest")
+                    withCredentials([usernamePassword(credentialsId: 'docker-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        // Rename the Docker image (optional step)
+                        def newImageName = "${CONTAINER_IMAGE_NAME}-renamed" // Change as needed
+                        sh "docker tag ${CONTAINER_IMAGE} ${newImageName}"
+
+                        // Login to Docker registry
+                        sh """
+                        echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
+                        docker push ${newImageName}
+                        """
                     }
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to k8s') {
             steps {
                 script {
-                    sh 'kubectl apply -f k8s/deployment.yaml'
+                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBE_CONFIG')]) {
+                        // Set up the Kubernetes configuration
+                        sh "export KUBECONFIG=${KUBE_CONFIG}"
+
+                        // Deploy to Kubernetes
+                        sh """
+                        kubectl apply -f k8s/deployment.yaml
+                        kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/${DOCKER_IMAGE}-renamed
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE}
+                        """
+                    }
                 }
             }
         }
+    }
     */
+
+    post {
+        success {
+            echo "Pipeline completed successfully! Image pushed: ${DOCKER_IMAGE}-renamed and deployed to Kubernetes."
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
     }
 }
-

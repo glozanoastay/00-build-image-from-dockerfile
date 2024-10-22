@@ -1,2 +1,4 @@
 tmp/
 .scannerwork/
+env/
+__pycache__/
