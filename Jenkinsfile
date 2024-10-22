@@ -37,7 +37,7 @@ pipeline {
             }
         }
 
-/*
+        /*
         stage('Push Container Image') {
             steps {
                 script {
@@ -75,6 +75,7 @@ pipeline {
         }
     }
     */
+    }
 
     post {
         success {
