@@ -1,5 +1,8 @@
 pipeline {
-    agent { dockerfile true }
+    agent { 
+      dockerfile true
+      label 'linux'
+    }
 
     environment {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
