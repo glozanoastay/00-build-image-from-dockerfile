@@ -22,14 +22,15 @@ pipeline {
         }
 
         stage('Static Analysis') {
+            agent { label 'linux' }
             steps {
                 script {
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
                         sh 'uname -a'
-                        sh 'ip a'
                         sh 'id'
                         sh 'ping -c 3 8.8.8.8'
                         sh 'whereis sonar-scanner'
+                        sh 'ip a'
                         sh """
                         sonar-scanner \
                             -Dsonar.projectKey=your-project-key \
