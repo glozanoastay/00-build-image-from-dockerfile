@@ -1,7 +1,5 @@
 pipeline {
-    agent { 
-      dockerfile true
-    }
+    agent { label 'linux' }
 
     environment {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
@@ -12,17 +10,23 @@ pipeline {
     }
 
     stages {
+        stage('Build Image') {
+            steps {
+                script {
+                    sh "docker build -t ${CONTAINER_IMAGE} ."
+                }
+            }
+        }
         stage('Run Tests') {
             steps {
                 script {
                     // Run tests in the Docker container
-                    sh 'python -m unittest test_app.py' // Replace with your test command
+                    sh "docker run --rm ${CONTAINER_IMAGE} python -m unittest test_app.py" // Replace with your test command
                 }
             }
         }
 
         stage('Static Analysis') {
-            agent { label 'linux' }
             steps {
                 script {
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
@@ -86,7 +90,7 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully! Image pushed: ${DOCKER_IMAGE}-renamed and deployed to Kubernetes."
+            echo "Pipeline completed successfully! Image pushed: ${CONTAINER_IMAGE_NAME}-renamed and deployed to Kubernetes."
         }
         failure {
             echo 'Pipeline failed.'
