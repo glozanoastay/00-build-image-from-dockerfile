@@ -1,5 +1,5 @@
 pipeline {
-    agent { dockerfile true }
+    agent { label 'linux' }
 
     environment {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
@@ -13,7 +13,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    //sh "docker build -t ${CONTAINER_IMAGE} ."
+                    sh "docker build -t ${CONTAINER_IMAGE} ."
                     sh "ls -l"
                     sh "id"
                     sh "ping -c 3 8.8.8.8"
@@ -25,21 +25,14 @@ pipeline {
             steps {
                 script {
                     // Run tests in the Docker container
-                    sh "python -m unittest test_app.py" // Replace with your test command
+                    sh "python3 -m unittest test_app.py" // Replace with your test command
                 }
             }
         }
 
         stage('Static Analysis') {
-            agent { label 'linux' }
             steps {
                 script {
-                    sh 'pwd'
-                    sh 'uname -a'
-                    sh 'id'
-                    sh 'ping -c 3 8.8.8.8'
-                    sh 'whereis sonar-scanner'
-                    sh 'ip a'
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
                         sh """
                         sonar-scanner \
