@@ -10,6 +10,7 @@ pipeline {
         K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
         K8S_NAMESPACE = 'example'
         SONARQUBE_PROJECT_KEY='00-build-image-from-dockerfile'
+        K8S_CREDENTIALS_ID = "jenkins-k8s-creds"
     }
 
     stages {
@@ -71,20 +72,19 @@ pipeline {
             }
         }
 
-        /*
         stage('Deploy to k8s') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'kubeconfig-id', variable: 'KUBE_CONFIG')]) {
-                        // Set up the Kubernetes configuration
-                        sh "export KUBECONFIG=${KUBE_CONFIG}"
-
-                        // Deploy to Kubernetes
+                    withKubeConfig(credentialsId: K8S_CREDENTIALS_ID) {
+                        sh 'kubectl cluster-info --insecure-skip-tls-verify'
+                        sh 'kubectl get pods --insecure-skip-tls-verify'
+                        /*
                         sh """
                         kubectl apply -f k8s/deployment.yaml
                         kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/${DOCKER_IMAGE}-renamed
                         kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE}
                         """
+                        */
                     }
                 }
             }
