@@ -5,7 +5,6 @@ pipeline {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
         CONTAINER_IMAGE_TAG = "${env.BUILD_NUMBER}" // ${env.BUILD_ID}
         CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
-        CONTAINER_REGISTRY = 'your-docker-registry-url'
         CONTAINER_REGISTER_CREDS = 'jenkins-dockerhub-astay'
         CONTAINER_REGISTER_URL = "https://index.docker.io/v1/"
         K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
@@ -17,11 +16,6 @@ pipeline {
             steps {
                 script {
                     docker.build(CONTAINER_IMAGE)
-                    //sh "docker build -t ${CONTAINER_IMAGE} ."
-                    sh "ls -l"
-                    sh "id"
-                    sh "ping -c 3 8.8.8.8"
-                    sh 'whereis sonar-scanner'
                 }
             }
         }
@@ -38,9 +32,9 @@ pipeline {
         stage('Static Analysis') {
             steps {
                 script {
-                    sh 'whereis sonar-scanner'
+                    sh 'sonar-scanner -v'
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
-                        sh 'whereis sonar-scanner'
+                        sh 'sonar-scanner -v'
                         sh """
                         sonar-scanner \
                             -Dsonar.projectKey=your-project-key \
