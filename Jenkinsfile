@@ -34,17 +34,7 @@ pipeline {
             steps {
                 script {
                     // Get the SonarScanner tool path
-                    def scannerHome = tool 'MySonarScanner'
-                    
-                    // Run the SonarScanner within the SonarQube environment
-                    withSonarQubeEnv() {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
-
-                    sh "echo ${scannerHome}/bin/sonar-scanner"
-                    sh "ls -l ${scannerHome}/bin/sonar-scanner"
-
-                    //sh "${scannerHome}/bin/sonar-scanner -v"
+                    def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv(installationName: 'sq1') { // Specify the SonarQube server name configured in Jenkins
                         sh "${scannerHome}/bin/sonar-scanner -v"
                         sh """
