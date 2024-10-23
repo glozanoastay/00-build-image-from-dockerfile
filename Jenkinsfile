@@ -3,8 +3,11 @@ pipeline {
 
     environment {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
-        CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${env.BUILD_NUMBER}" // ${env.BUILD_ID}
+        CONTAINER_IMAGE_TAG = "${env.BUILD_NUMBER}" // ${env.BUILD_ID}
+        CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
         CONTAINER_REGISTRY = 'your-docker-registry-url'
+        CONTAINER_REGISTER_CREDS = 'jenkins-dockerhub-astay'
+        CONTAINER_REGISTER_URL = "https://index.docker.io/v1/"
         K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
         K8S_NAMESPACE = 'example'
     }
@@ -35,7 +38,9 @@ pipeline {
         stage('Static Analysis') {
             steps {
                 script {
+                    sh 'whereis sonar-scanner'
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
+                        sh 'whereis sonar-scanner'
                         sh """
                         sonar-scanner \
                             -Dsonar.projectKey=your-project-key \
@@ -49,17 +54,19 @@ pipeline {
             }
         }
 
-        /*
+
         stage('Push Container Image') {
             steps {
                 script {
-                    docker.withRegistry(REGISTRY_URL, DOCKER_CREDENTIALS_ID) {
-                        docker.image(CONTAINER_IMAGE).push('latest')
+                    docker.withRegistry(CONTAINER_REGISTER_URL, CONTAINER_REGISTER_CREDS) {
+                        docker.image(CONTAINER_IMAGE_NAME).push(CONTAINER_IMAGE_TAG)
+                        docker.image(CONTAINER_IMAGE_NAME).push('latest')
                     }
                 }
             }
         }
 
+        /*
         stage('Deploy to k8s') {
             steps {
                 script {
