@@ -26,8 +26,6 @@ pipeline {
                     docker.image(CONTAINER_IMAGE).inside {
                         sh "python3 -m unittest test_app.py"    
                     }
-
-                    sh 'sonar-scanner -v'
                 }
             }
         }
