@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     // Get the SonarScanner tool path
-                    def scannerHome = tool 'SonarScanner'
+                    def scannerHome = tool 'MySonarScanner'
                     
                     // Run the SonarScanner within the SonarQube environment
                     withSonarQubeEnv() {
