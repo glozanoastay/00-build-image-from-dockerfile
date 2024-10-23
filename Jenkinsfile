@@ -10,15 +10,17 @@ pipeline {
     }
 
     stages {
-        /*
         stage('Build Image') {
             steps {
                 script {
-                    sh "docker build -t ${CONTAINER_IMAGE} ."
+                    //sh "docker build -t ${CONTAINER_IMAGE} ."
+                    sh "ls -l"
+                    sh "id"
+                    sh "ping -c 3 8.8.8.8"
+                    sh 'whereis sonar-scanner'
                 }
             }
         }
-        */
         stage('Run Tests') {
             steps {
                 script {
