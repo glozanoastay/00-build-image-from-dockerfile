@@ -75,17 +75,22 @@ pipeline {
         stage('Deploy to k8s') {
             steps {
                 script {
-                    withKubeConfig(credentialsId: K8S_CREDENTIALS_ID) {
+                    /*
+                    withKubeConfig(credentialsId: "${K8S_CREDENTIALS_ID}") {
                         sh 'kubectl cluster-info --insecure-skip-tls-verify'
                         sh 'kubectl get pods --insecure-skip-tls-verify'
-                        /*
                         sh """
                         kubectl apply -f k8s/deployment.yaml
                         kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_DEPLOYMENT_NAME}=${DOCKER_REGISTRY}/${DOCKER_IMAGE}-renamed
                         kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE}
                         """
-                        */
                     }
+                    */
+                    withCredentials([string(credentialsId: K8S_CREDENTIALS_ID, variable: 'K8S_TOKEN')]) {
+                        sh 'kubectl cluster-info --insecure-skip-tls-verify --token=${K8S_TOKEN}'
+                        sh 'kubectl get pods --insecure-skip-tls-verify --token=${K8S_TOKEN}'
+                    }
+
                 }
             }
         }
