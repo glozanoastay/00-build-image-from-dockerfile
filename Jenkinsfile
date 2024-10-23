@@ -13,7 +13,8 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    sh "docker build -t ${CONTAINER_IMAGE} ."
+                    docker.build(CONTAINER_IMAGE)
+                    //sh "docker build -t ${CONTAINER_IMAGE} ."
                     sh "ls -l"
                     sh "id"
                     sh "ping -c 3 8.8.8.8"
@@ -24,8 +25,9 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    // Run tests in the Docker container
-                    sh "python3 -m unittest test_app.py" // Replace with your test command
+                    docker.image(CONTAINER_IMAGE).inside {
+                        sh "python3 -m unittest test_app.py"    
+                    }
                 }
             }
         }
@@ -51,16 +53,8 @@ pipeline {
         stage('Push Container Image') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                        // Rename the Docker image (optional step)
-                        def newImageName = "${CONTAINER_IMAGE_NAME}-renamed" // Change as needed
-                        sh "docker tag ${CONTAINER_IMAGE} ${newImageName}"
-
-                        // Login to Docker registry
-                        sh """
-                        echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USERNAME} --password-stdin
-                        docker push ${newImageName}
-                        """
+                    docker.withRegistry(REGISTRY_URL, DOCKER_CREDENTIALS_ID) {
+                        docker.image(CONTAINER_IMAGE).push('latest')
                     }
                 }
             }
