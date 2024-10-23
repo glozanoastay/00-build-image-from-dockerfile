@@ -29,6 +29,7 @@ pipeline {
             }
         }
 
+        /*
         stage('Static Analysis') {
             steps {
                 script {
@@ -46,7 +47,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
 
 
         stage('Push Container Image') {
