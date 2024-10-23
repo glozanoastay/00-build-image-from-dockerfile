@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
-        CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${env.BUILD_NUMBER}"
+        CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${env.BUILD_NUMBER}" // ${env.BUILD_ID}
         CONTAINER_REGISTRY = 'your-docker-registry-url'
         K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
         K8S_NAMESPACE = 'example'
@@ -38,7 +38,6 @@ pipeline {
                     sh 'ping -c 3 8.8.8.8'
                     sh 'whereis sonar-scanner'
                     sh 'ip a'
-                    
                     withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
                         sh """
                         sonar-scanner \
