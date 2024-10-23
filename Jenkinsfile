@@ -43,7 +43,10 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
 
-                    sh "${scannerHome}/bin/sonar-scanner -v"
+                    sh "echo ${scannerHome}/bin/sonar-scanner"
+                    sh "ls -l ${scannerHome}/bin/sonar-scanner"
+
+                    //sh "${scannerHome}/bin/sonar-scanner -v"
                     withSonarQubeEnv(installationName: 'sq1') { // Specify the SonarQube server name configured in Jenkins
                         sh "${scannerHome}/bin/sonar-scanner -v"
                         sh """
