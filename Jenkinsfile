@@ -55,8 +55,8 @@ pipeline {
                 script {
                     sh 'docker images'
                     docker.withRegistry(CONTAINER_REGISTER_URL, CONTAINER_REGISTER_CREDS) {
-                        docker.image(CONTAINER_IMAGE_NAME).push(CONTAINER_IMAGE_TAG)
-                        docker.image(CONTAINER_IMAGE_NAME).push('latest')
+                        docker.image(CONTAINER_IMAGE).push()
+                        docker.image(CONTAINER_IMAGE).push('latest')
                     }
                 }
             }
