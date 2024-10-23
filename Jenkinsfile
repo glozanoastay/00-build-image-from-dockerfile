@@ -2,7 +2,7 @@ pipeline {
     agent { label 'linux' }
 
     environment {
-        CONTAINER_IMAGE_NAME = 'example-sonarqube-python'
+        CONTAINER_IMAGE_NAME = 'glozanoastay/example-sonarqube-python'
         CONTAINER_IMAGE_TAG = "${env.BUILD_NUMBER}" // ${env.BUILD_ID}
         CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
         CONTAINER_REGISTER_CREDS = 'jenkins-dockerhub-astay'
