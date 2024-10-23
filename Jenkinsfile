@@ -9,6 +9,7 @@ pipeline {
         CONTAINER_REGISTER_URL = "https://index.docker.io/v1/"
         K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
         K8S_NAMESPACE = 'example'
+        SONARQUBE_PROJECT_KEY='00-build-image-from-dockerfile'
     }
 
     stages {
@@ -25,29 +26,46 @@ pipeline {
                     docker.image(CONTAINER_IMAGE).inside {
                         sh "python3 -m unittest test_app.py"    
                     }
+
+                    sh 'sonar-scanner -v'
                 }
             }
         }
 
-        /*
         stage('Static Analysis') {
             steps {
                 script {
-                    sh 'sonar-scanner -v'
-                    withSonarQubeEnv('sq1') { // Specify the SonarQube server name configured in Jenkins
-                        sh 'sonar-scanner -v'
+                    // Get the SonarScanner tool path
+                    def scannerHome = tool 'SonarScanner'
+                    
+                    // Run the SonarScanner within the SonarQube environment
+                    withSonarQubeEnv() {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+
+                    sh "${scannerHome}/bin/sonar-scanner -v"
+                    withSonarQubeEnv(installationName: 'sq1') { // Specify the SonarQube server name configured in Jenkins
+                        sh "${scannerHome}/bin/sonar-scanner -v"
                         sh """
-                        sonar-scanner \
-                            -Dsonar.projectKey=your-project-key \
+                        ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
                             -Dsonar.projectName=${CONTAINER_IMAGE_NAME} \
                             -Dsonar.projectVersion=${env.BUILD_NUMBER} \
                             -Dsonar.sources=. \
-                            -Dsonar.language=python # Replace with your language if different
+                            -Dsonar.language=python
                         """
                     }
                 }
             }
-        }*/
+        }
+
+        stage('Quality Gate'){
+            steps {
+                timeout(time: 2, unit: 'MINUTES'){
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
 
         stage('Push Container Image') {
