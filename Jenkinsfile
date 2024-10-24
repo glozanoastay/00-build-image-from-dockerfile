@@ -7,10 +7,11 @@ pipeline {
         CONTAINER_IMAGE = "${CONTAINER_IMAGE_NAME}:${CONTAINER_IMAGE_TAG}"
         CONTAINER_REGISTER_CREDS = 'jenkins-dockerhub-astay'
         CONTAINER_REGISTER_URL = "https://index.docker.io/v1/"
-        K8S_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
-        K8S_NAMESPACE = 'example'
         SONARQUBE_PROJECT_KEY='00-build-image-from-dockerfile'
-        K8S_CREDENTIALS_ID = "jenkins-k8s-creds"
+        KUBE_DEPLOYMENT_NAME = 'example-sonarqube-python-deploy'
+        KUBE_POD_NAME = 'example-sonarqube-python-deploy'
+        KUBE_NAMESPACE = 'jenkins'
+        KUBE_CREDENTIALS_ID = "jenkins-k8s-creds"
     }
 
     stages {
@@ -37,7 +38,6 @@ pipeline {
                     // Get the SonarScanner tool path
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv(installationName: 'sq1') { // Specify the SonarQube server name configured in Jenkins
-                        sh "${scannerHome}/bin/sonar-scanner -v"
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
@@ -59,9 +59,16 @@ pipeline {
             }
         }
 
-        stage('Vulnerability Scanner'){
+        stage('Container Image Vulnerability Scanner'){
             steps {
                 sh "trivy image --light --exit-code 0 --pkg-types library --severity HIGH,CRITICAL ${CONTAINER_IMAGE}"
+            }
+        }
+
+        stage('Repository Vulnerability Scanner'){
+            steps {
+                sh 'echo 1'
+                //sh "trivy image --light --exit-code 0 --pkg-types library --severity HIGH,CRITICAL ${CONTAINER_IMAGE}"
             }
         }
 
@@ -82,10 +89,18 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: K8S_CREDENTIALS_ID, variable: 'KUBE_CONFIG')]) {
+                        /*
                         sh"""
                         export KUBECONFIG=${KUBE_CONFIG}
                         kubectl cluster-info --insecure-skip-tls-verify
                         kubectl get pods --insecure-skip-tls-verify
+                        """
+                        */
+                        sh"""
+                        export KUBECONFIG=${KUBE_CONFIG}
+                        kubectl apply -f k8s/deployment.yaml
+                        kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_POD_NAME}=${CONTAINER_IMAGE}
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE}
                         """
                     }
 
