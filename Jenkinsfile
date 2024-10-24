@@ -86,9 +86,13 @@ pipeline {
                         """
                     }
                     */
-                    withCredentials([string(credentialsId: K8S_CREDENTIALS_ID, variable: 'K8S_TOKEN')]) {
-                        sh 'kubectl cluster-info --insecure-skip-tls-verify --token=${K8S_TOKEN}'
-                        sh 'kubectl get pods --insecure-skip-tls-verify --token=${K8S_TOKEN}'
+                    //withCredentials([string(credentialsId: K8S_CREDENTIALS_ID, variable: 'K8S_TOKEN')]) {
+                    withCredentials([file(credentialsId: 'jenkins-kubeconfig', variable: 'KUBE_CONFIG')]) {
+                        sh"""
+                        export KUBECONFIG=${KUBE_CONFIG}
+                        kubectl cluster-info --insecure-skip-tls-verify
+                        kubectl get pods --insecure-skip-tls-verify
+                        """
                     }
 
                 }
