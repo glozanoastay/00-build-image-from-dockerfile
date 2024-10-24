@@ -98,9 +98,9 @@ pipeline {
                         */
                         sh"""
                         export KUBECONFIG=${KUBE_CONFIG}
-                        kubectl apply -f k8s/deployment.yaml
-                        kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_POD_NAME}=${CONTAINER_IMAGE}
-                        kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE}
+                        kubectl apply -f k8s/deployment.yaml --insecure-skip-tls-verify
+                        kubectl set image deployment/${KUBE_DEPLOYMENT_NAME} ${KUBE_POD_NAME}=${CONTAINER_IMAGE} --insecure-skip-tls-verify
+                        kubectl rollout status deployment/${KUBE_DEPLOYMENT_NAME} -n ${KUBE_NAMESPACE} --insecure-skip-tls-verify
                         """
                     }
 
