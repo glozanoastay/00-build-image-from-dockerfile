@@ -88,7 +88,7 @@ pipeline {
         stage('Deploy to k8s') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: K8S_CREDENTIALS_ID, variable: 'KUBE_CONFIG')]) {
+                    withCredentials([file(credentialsId: KUBE_CREDENTIALS_ID, variable: 'KUBE_CONFIG')]) {
                         /*
                         sh"""
                         export KUBECONFIG=${KUBE_CONFIG}
